@@ -60,8 +60,14 @@ def draw_grid(board, screen):
         pygame.draw.line(screen, BLACK, (col * offset, 0), (col * offset, h), margin)
 
 
-def vis_solver(board, screen):
+def vis_solver(board, screen, speed):
     cell = find_empty(board)
+    if speed == 'S':
+        delay = 100
+    elif speed == 'M':
+        delay = 50
+    else:
+        delay = 10
     if cell is not None:
         for n in range(1, 10):
             if is_valid(board.model, n, cell.row, cell.col):
@@ -70,15 +76,15 @@ def vis_solver(board, screen):
                 cell.draw_cell(screen)
                 draw_grid(board, screen)
                 pygame.display.update()
-                pygame.time.delay(100)
-                if vis_solver(board, screen):
+                pygame.time.delay(delay)
+                if vis_solver(board, screen, speed):
                     return True
                 cell.value = 0
                 board.model[cell.row][cell.col] = 0
                 cell.draw_cell(screen)
                 pygame.display.update()
                 draw_grid(board, screen)
-                pygame.time.delay(100)
+                pygame.time.delay(delay)
         return False
     return True
 
@@ -112,7 +118,7 @@ def is_valid(model, n, i, j):
     return True
 
 
-def main(board):
+def main(board, speed):
     WINDOW_SIZE = [540, 540]
     screen = pygame.display.set_mode(WINDOW_SIZE)
     screen.fill(WHITE)
@@ -127,10 +133,11 @@ def main(board):
                 done = True
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    vis_solver(board, screen)
+                    vis_solver(board, screen, speed)
 
 
-board = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
+# board0 takes A REALLY long time visually to solve. It isn't an infinite loop I promise
+board0 = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
          [6, 0, 0, 1, 9, 5, 0, 0, 0],
          [0, 9, 8, 0, 0, 0, 0, 6, 0],
          [8, 0, 0, 0, 6, 0, 0, 0, 3],
@@ -140,7 +147,18 @@ board = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
          [0, 0, 0, 4, 1, 9, 0, 0, 5],
          [0, 0, 0, 0, 8, 0, 0, 7, 9]]
 
-b = Board(board, 540, 540)
-main(b)
+board1 = [[7, 8, 0, 4, 0, 0, 1, 2, 0],
+    [6, 0, 0, 0, 7, 5, 0, 0, 9],
+    [0, 0, 0, 6, 0, 1, 0, 7, 8],
+    [0, 0, 7, 0, 4, 0, 2, 6, 0],
+    [0, 0, 1, 0, 5, 0, 9, 3, 0],
+    [9, 0, 4, 0, 6, 0, 0, 0, 5],
+    [0, 7, 0, 3, 0, 0, 0, 1, 2],
+    [1, 2, 0, 0, 0, 7, 4, 0, 0],
+    [0, 4, 9, 2, 0, 6, 0, 0, 7]]
+
+b = Board(board0, 540, 540)
+speed = 'F'  # F = 10ms delay, M = 50ms delay, S = 100ms delay
+main(b, speed)
 
 pygame.quit()
